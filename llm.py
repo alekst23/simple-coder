@@ -5,7 +5,7 @@ from config import OPENAI_API_KEY
 import logging
 import time
 
-openai.api_key = os.getenv("OPENAI_API_KEY")
+openai.api_key = OPENAI_API_KEY
 
 C_DEFAULT_MODEL = "gpt-3.5-turbo-16k"
 C_DEFAULT_TEMP = 0.8

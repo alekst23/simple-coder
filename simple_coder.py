@@ -2,11 +2,12 @@ import traceback
 from datetime import datetime
 import llm
 import os
-import asyncio
 import re
+from pathlib import Path
 
-C_WORKING_DIR = "simple_code_work"
+C_WORKING_DIR = "~/temp/simple_coder"
 C_CONFIG_CODER = "simple-coder.txt"
+C_SYSTEM_FILE = "system-log.txt"
 C_STOP_CODE = "JOBDONE"
 C_MAX_EPOCH = 10
 
@@ -28,10 +29,10 @@ class SimpleCoder:
     
 
     def get_config(self, config_file=C_CONFIG_CODER):
-        if not self.state.get('instructions', False):
+        if not self.state.get('role_config', False):
             # get data from config file: confg/simple-coder.txt
             with open(os.path.join(os.getcwd(), "config", config_file), "r") as file:
-                self.state['instructions'] = file.read()
+                self.state['role_config'] = file.read()
 
         if self.state.get('requirements', False):
             # Check if requirements are an input file
@@ -44,23 +45,6 @@ class SimpleCoder:
             # check if source file exists and load it
             if file_content := self.get_file_contents(self.state['output_file_name']):
                 self.state['input_code'] = file_content
-
-
-    def get_file_contents(self, file_name):
-
-        file_name = file_name.strip() or self.state.get('output_file_name', None)
-        file_path = os.path.join(self.working_dir, file_name)
-        base_path = os.path.dirname(file_path)
-        if not os.path.exists(base_path):
-            os.makedirs(base_path)
-        if not os.path.exists(file_path):
-            # create the file
-            with open(file_path, "w") as file:
-                file.write("")
-            return ""
-        else:
-            with open(file_path, "r") as file:
-                return file.read()
             
 
     async def run(self):
@@ -94,16 +78,21 @@ class SimpleCoder:
 
     async def compose_message_log(self):
         try:
+            if not self.state: raise Exception("State is not set")
+            if not self.state.get('output_file_name', False): raise Exception("Output file name is not set")
+            if not self.state.get('requirements', False): raise Exception("Requirements are not set")
+            if not self.state.get('role_config', False): raise Exception("role_config are not set")
+
             assert self.state is not None, 'state'
             assert self.state.get('requirements', False), 'requirements not provided'
             assert self.state.get('output_file_name', False), 'output file name not provided'
-            assert self.state.get('instructions', False), 'instructions are not set'
+            assert self.state.get('role_config', False), 'role_config are not set'
     
 
-            # Compose message from instructions, file contents, file output, and requirements
+            # Compose message from role_config, file contents, file output, and requirements
             
-            # instructions
-            msg_instructions = self.make_message_instruction()
+            # role_config
+            msg_role_config = self.make_message_role_config()
             
             # reference materials
             msg_file_data = self.make_message_materials()
@@ -118,15 +107,15 @@ class SimpleCoder:
             msg_end_control = self.make_message_endControl()
 
             # compose message
-            self.message_log = msg_instructions + msg_file_data + msg_input_code + msg_requirements + msg_end_control
+            self.message_log = msg_role_config + msg_file_data + msg_input_code + msg_requirements + msg_end_control
                     
         except Exception as e:
             print(traceback.print_exc())
             raise e
     
 
-    def make_message_instruction(self):
-        return [self.make_user_message(line) for line in self.state['instructions'].split("\n")]
+    def make_message_role_config(self):
+        return [self.make_user_message(line) for line in self.state['role_config'].split("\n")]
     
 
     def make_message_materials(self):
@@ -183,6 +172,7 @@ class SimpleCoder:
         # Generate a response
         response = await llm.generate_chat_completion(self.message_log)
 
+        # log its
         self.print_to_system_log(f"RESPONSE: {response}")
 
         return response
@@ -259,30 +249,24 @@ class SimpleCoder:
             return None
     
 
-    async def store_code_file(self, code):
+    async def store_code_file(self, code_block):
         try:
-            if isinstance(code, str):
-                code = {
+            if isinstance(code_block, str):
+                code_block = {
                     "file_name": self.state['output_file_name'],
-                    "code": code
+                    "code": code_block
                 }
 
-            assert isinstance(code, dict), "Code must be a dict."
-            assert "code" in code, "Code must have code."
+            if not isinstance(code_block, dict): raise Exception("code_block must be a dict.")
+            if not "code" in code_block: raise Exception("code_block object must have code property.")
             
-            if code["code"] == "JOBDONE":
+            if code_block["code"] == "JOBDONE":
                 return True
             
-            if "file_name" not in code:
-                code["file_name"] = self.state['output_file_name']
+            if "file_name" not in code_block:
+                code_block["file_name"] = self.state['output_file_name']
 
-            # Create the directory if it does not exist
-            if not os.path.exists(self.working_dir):
-                os.makedirs(self.working_dir)
-
-            # save code to file
-            with open(os.path.join(self.working_dir, code['file_name']), "w") as f:
-                f.write(code['code'])
+            self.write_to_file(code_block["file_name"], f"{code_block['code']}\n")
 
             return True
         
@@ -296,8 +280,28 @@ class SimpleCoder:
                 
 
     def print_to_system_log(self, message):
-        # Print the message to a file
-        with open(os.path.join(C_WORKING_DIR, "system_log.txt"), "a") as f:
-            # print message with a fomratted timestamp
-            f.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n{message}\n\n")
+        self.write_to_file(C_SYSTEM_FILE, f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n{message}\n\n", append=True)
 
+    
+    def get_file_contents(self, file_name):
+        file_name = file_name.strip() or self.state.get('output_file_name', None)
+        file_path = Path(self.working_dir) / file_name
+        file_path = file_path.expanduser()
+        file_path.parent.mkdir(parents=True, exist_ok=True)
+
+        try:
+            with open(file_path, 'r') as file:
+                return file.read()
+        except FileNotFoundError:
+            with open(file_path, 'w') as file:
+                return ""
+            
+
+    def write_to_file(self, file_name, content, append=False):
+        file_name = file_name.strip() or self.state.get('output_file_name', None)
+        file_path = Path(self.working_dir) / file_name
+        file_path = file_path.expanduser()
+        file_path.parent.mkdir(parents=True, exist_ok=True)
+
+        with open(file_path, 'a' if append else 'w') as file:
+            file.write(content)
