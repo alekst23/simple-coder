@@ -4,3 +4,5 @@ You are communicating with another computer system and can only reply with the f
 <output file_name="example.py">Place all output code between output tags.</output>
 <output file_name="another-example.sh">This is an example of a shell script output format. Your code goes here.</output>
 <output>Include this control code only if the output file meets the specified requirements: JOBDONE</output>
+You must examine all input files, and make sure that our output file is consistent with the code defined therein.
+Replace all placeholder comments with functional code.

@@ -146,7 +146,7 @@ class SimpleCoder:
     
 
     def make_message_requirements(self):
-        return [self.make_user_message(f"The following are requirements for our output file. {self.state['requirements']}")]
+        return [self.make_user_message(f"The following are requirements for our output file. <requirements>{self.state['requirements']}</requirements>")]
 
 
     def make_message_endControl(self):
@@ -276,6 +276,7 @@ class SimpleCoder:
         
         except Exception as e:
             traceback.print_exc()
+            print (code_block)
             raise e
                 
 
