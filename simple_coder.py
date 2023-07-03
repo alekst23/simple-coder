@@ -50,13 +50,15 @@ class SimpleCoder:
     async def run(self):
         while self.run_b:
             print(f"Epoch: {self.run_epoch}")
-            self.run_epoch += 1
+            
             await self.work()
 
             if self.run_epoch > C_MAX_EPOCH:
                 # Write code state to file
                 await self.store_code_file(self.state.get('input_code'))
                 self.run_b = False
+            
+            self.run_epoch += 1
 
         return self.state.get('output_file_name', False)
 
