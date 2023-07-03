@@ -1,11 +1,11 @@
 ## What is Molecul-AI
-This library presents a minimized implementation of an LLM agent with a focus on generating code and apps. 
 
-We implement a very simple optimization method using recursion, similar to Reflection ([paper](link))
+This repo is a minimized implementation of an LLM agent, with a focus on generating code using optimization techniques to enhance the code generating abilities of the bare underlying LLM.
 
-It is a simple python library that you can run on your machine, with your choice of an LLM service provider.
+We implement a recursive method, similar to Reflexion ([github](https://github.com/noahshinn024/reflexion)), where the LLM re-evaluates the code that it generates. 
 
-You can use a SimpleCoder instance to generate simple scripts, build applications, or refactor existing code.
+You can use our SimpleCoder agent to generate simple scripts, refactor existing code, or help you build out application frameworks.
 
-## Why I made SimpleCoder
-One of my goals here is to minimize the overhead for *understanding* how LLM agents works, and how we could possibly improve their ability. All the implimentations I have seen include some serious code overhead because they are trying to do so much at once. This makes it much harder to understand the *core* principles that you may need to utilize in *your* project.
+## Goal
+
+Our goal is to *simplify* the LLM agent design, and create a simple code generating interface to an LLM that runs in your local environment. 

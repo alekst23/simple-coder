@@ -85,12 +85,6 @@ class SimpleCoder:
             if not self.state.get('requirements', False): raise Exception("Requirements are not set")
             if not self.state.get('role_config', False): raise Exception("role_config are not set")
 
-            assert self.state is not None, 'state'
-            assert self.state.get('requirements', False), 'requirements not provided'
-            assert self.state.get('output_file_name', False), 'output file name not provided'
-            assert self.state.get('role_config', False), 'role_config are not set'
-    
-
             # Compose message from role_config, file contents, file output, and requirements
             
             # role_config
@@ -152,14 +146,30 @@ class SimpleCoder:
 
 
     def make_message_endControl(self):
-        msg_1 = f"Analyze the contents of the output file {self.state['output_file_name']}. " if self.state.get('input_code', False) else ""
+        if self.state.get('input_code', False):
+            # if input code exists, ask for modification
+            msg_1 = f"Given the content in '{self.state['output_file_name']}' and the requirements provided, could you help me modify it to meet these requirements? Specifically, I would like to see a revised version of '{self.state['output_file_name']}' that includes all necessary changes and additions."
 
-        if self.state.get('force_code', False):
-            msg_end_control = [self.make_user_message(f"{msg_1}Generate code to meet the specified requirements. Reply with {C_STOP_CODE} only if the file is not empty and it meets the defined requirements.")]
+            msg_1b = f"Modify the content in '{self.state['output_file_name']}' to meet the provided requirements. Generate a revised version of '{self.state['output_file_name']}' that includes all necessary changes and additions."
         else:
-            msg_end_control = [self.make_user_message(f"{msg_1}Generate output for the file contents that is consistent with the specified requirements.  Reply with {C_STOP_CODE} only if the file is not empty and it meets the defined requirements.")]
+            # if input code does not exist, ask for creation
+            if self.state.get('force_code', False):
+                # if force_code is set, ask for code creation specifically
+                msg_1 = f"Given the requirements provided, could you help me create a new file named '{self.state['output_file_name']}' that fulfills these requirements? Specifically, I would like you to generate the code for '{self.state['output_file_name']}' that includes all necessary functionalities and features as per the requirements."
+
+                msg1_b = f"Create a new file '{self.state['output_file_name']}' to fulfill the provided requirements. Generate code for '{self.state['output_file_name']}' including all necessary functionalities and features as per the requirements."
+
+            else:
+                # ask for creation of generic file
+                msg_1 = f"Given the requirements provided, could you help me create a new file named '{self.state['output_file_name']}' that fulfills these requirements? Specifically, I would like you to generate the content for '{self.state['output_file_name']}' that includes all necessary elements as per the requirements."
+                
+                msg_1b = f"Create a new file '{self.state['output_file_name']}'. This file should fulfill the provided requirements. Generate content for '{self.state['output_file_name']}' including all necessary elements as per the requirements."
+
+        msg_2 = f" Reply with {C_STOP_CODE} only if the file is not empty and it meets the defined requirements."
+
+        msg_end_control = msg_1 + msg_2
         
-        return msg_end_control
+        return [ self.make_user_message(msg_end_control) ]
     
 
     def make_system_message(self, message):
