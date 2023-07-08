@@ -1,4 +1,10 @@
-## What is Molecul-AI
+# MoleculAI - Code generating agent for your LLM
+
+Improving the code generating performance of LLMs
+
+## Small is Good
+
+Our goal is to demystify LLM agents, and illustrate how very simple behaviors can be used to create gains in output accuracy. 
 
 This repo is a minimized implementation of an LLM agent, with a focus on generating code using optimization techniques to enhance the code generating abilities of the bare underlying LLM.
 

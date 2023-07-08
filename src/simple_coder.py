@@ -12,7 +12,7 @@ C_STOP_CODE = "JOBDONE"
 C_MAX_EPOCH = 10
 
 class SimpleCoder:
-    def __init__(self, working_dir=C_WORKING_DIR, requirements=None, output_file_name=None, input_file_name_list=None, force_code=True):
+    def __init__(self, working_dir=C_WORKING_DIR, requirements=None, output_file_name=None, input_file_name_list=None, force_code=True, silent=False):
         self.working_dir = working_dir
         self.message_log = []
 
@@ -24,6 +24,7 @@ class SimpleCoder:
 
         self.run_b = True
         self.run_epoch = 0
+        self.silent = silent
 
         self.get_config()
     
@@ -31,7 +32,8 @@ class SimpleCoder:
     def get_config(self, config_file=C_CONFIG_CODER):
         if not self.state.get('role_config', False):
             # get data from config file: confg/simple-coder.txt
-            with open(os.path.join(os.getcwd(), "config", config_file), "r") as file:
+            current_dir = os.path.dirname(os.path.realpath(__file__))
+            with open(os.path.join(current_dir, "config", config_file), "r") as file:
                 self.state['role_config'] = file.read()
 
         if self.state.get('requirements', False):
@@ -49,7 +51,8 @@ class SimpleCoder:
 
     async def run(self):
         while self.run_b:
-            print(f"Epoch: {self.run_epoch}")
+            if not self.silent:
+                print(f"Epoch: {self.run_epoch}")
             
             await self.work()
 
@@ -206,6 +209,9 @@ class SimpleCoder:
             self.state['output'] = response
 
         if code and code["code"] != C_STOP_CODE:
+            # Stop code may be present inside the code
+            code["code"] = code["code"].replace(C_STOP_CODE,"")
+
             # Store the code to state
             self.state['input_code'] = code
 

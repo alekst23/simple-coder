@@ -31,6 +31,10 @@ async def generate_chat_completion(message_log, model_name=C_DEFAULT_MODEL, max_
             logging.info("(generate_chat_completion) Rate limit exceeded, retrying...")
             time.sleep(5)
             continue
+        except openai.error.ServiceUnavailableError:
+            logging.info("(generate_chat_completion) ServiceUnavailableError, retrying...")
+            time.sleep(5)
+            continue
         except AssertionError as e:
             logging.error("(generate_chat_completion) " + str(e))
             return None
