@@ -10,7 +10,7 @@ openai.api_key = OPENAI_API_KEY
 C_DEFAULT_MODEL = "gpt-3.5-turbo-16k"
 C_DEFAULT_TEMP = 0.8
 C_DEFAULT_MAX_TOKENS = 8000
-C_DEFAULT_MODEL_MAX_TOKENS = 16385 #4096
+C_DEFAULT_MODEL_MAX_TOKENS = 16385 # 4096
 
 # Use openAI ChatGPT 3.5 Turbo chat completion end point
 async def generate_chat_completion(message_log, model_name=C_DEFAULT_MODEL, max_tokens=C_DEFAULT_MAX_TOKENS, temp=C_DEFAULT_TEMP):

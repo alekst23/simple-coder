@@ -3,6 +3,7 @@ system-log.txt
 
 human-eval/
 human-eval-output/
+test-output/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

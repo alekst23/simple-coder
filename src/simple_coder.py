@@ -75,6 +75,8 @@ class SimpleCoder:
 
                 await self.process_response(response)
 
+                await self.store_code_file(self.state.get('input_code'))
+
         except Exception as e:
             print(traceback.print_exc())
             print(f"Error: {e}")
@@ -151,20 +153,20 @@ class SimpleCoder:
     def make_message_endControl(self):
         if self.state.get('input_code', False):
             # if input code exists, ask for modification
-            msg_1 = f"Given the content in '{self.state['output_file_name']}' and the requirements provided, could you help me modify it to meet these requirements? Specifically, I would like to see a revised version of '{self.state['output_file_name']}' that includes all necessary changes and additions."
+            msg_1 = f"Given the content in '{self.state['output_file_name']}' and the requirements provided, could you help me modify it to meet these requirements? Specifically, I would like to see a version of '{self.state['output_file_name']}' that includes all necessary changes and additions."
 
-            msg_1b = f"Modify the content in '{self.state['output_file_name']}' to meet the provided requirements. Generate a revised version of '{self.state['output_file_name']}' that includes all necessary changes and additions."
+            msg_1b = f"Modify the content in '{self.state['output_file_name']}' to meet the provided requirements. Generate a version of '{self.state['output_file_name']}' that includes all necessary changes and additions."
         else:
             # if input code does not exist, ask for creation
             if self.state.get('force_code', False):
                 # if force_code is set, ask for code creation specifically
-                msg_1 = f"Given the requirements provided, could you help me create a new file named '{self.state['output_file_name']}' that fulfills these requirements? Specifically, I would like you to generate the code for '{self.state['output_file_name']}' that includes all necessary functionalities and features as per the requirements."
+                msg_1 = f"Given the requirements provided, could you help me create content for file named '{self.state['output_file_name']}' that fulfills these requirements? Specifically, I would like you to generate the code for '{self.state['output_file_name']}' that includes all necessary functionalities and features as per the requirements."
 
                 msg1_b = f"Create a new file '{self.state['output_file_name']}' to fulfill the provided requirements. Generate code for '{self.state['output_file_name']}' including all necessary functionalities and features as per the requirements."
 
             else:
                 # ask for creation of generic file
-                msg_1 = f"Given the requirements provided, could you help me create a new file named '{self.state['output_file_name']}' that fulfills these requirements? Specifically, I would like you to generate the content for '{self.state['output_file_name']}' that includes all necessary elements as per the requirements."
+                msg_1 = f"Given the requirements provided, could you help me create content for file named '{self.state['output_file_name']}' that fulfills these requirements? Specifically, I would like you to generate the content for '{self.state['output_file_name']}' that includes all necessary elements as per the requirements."
                 
                 msg_1b = f"Create a new file '{self.state['output_file_name']}'. This file should fulfill the provided requirements. Generate content for '{self.state['output_file_name']}' including all necessary elements as per the requirements."
 
@@ -213,7 +215,7 @@ class SimpleCoder:
             code["code"] = code["code"].replace(C_STOP_CODE,"")
 
             # Store the code to state
-            self.state['input_code'] = code
+            self.state['input_code'] = code["code"]
 
         # Check if <DONE> is in response
         if (C_STOP_CODE in response) and self.run_epoch > 0:
@@ -284,7 +286,14 @@ class SimpleCoder:
             if "file_name" not in code_block:
                 code_block["file_name"] = self.state['output_file_name']
 
-            self.write_to_file(code_block["file_name"], f"{code_block['code']}\n")
+            # clean the output
+            code_text = code_block["code"].strip()
+            # check if it's markdown code block
+            if code_text[:3]=='```':
+                # remove first line
+                code_text = code_text[code_text.find('\n')+1:-3]
+
+            self.write_to_file(code_block["file_name"], f"{code_text}\n")
 
             return True
         
