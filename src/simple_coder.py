@@ -12,14 +12,14 @@ C_STOP_CODE = "JOBDONE"
 C_MAX_EPOCH = 10
 
 class SimpleCoder:
-    def __init__(self, working_dir=C_WORKING_DIR, requirements=None, output_file_name=None, input_file_name_list=None, force_code=True, silent=False):
+    def __init__(self, working_dir=C_WORKING_DIR, requirements=None, output_file_name=None, input_file_list=None, force_code=True, silent=False):
         self.working_dir = working_dir
         self.message_log = []
 
         self.state = {}
         self.state['requirements'] = requirements
         self.state['output_file_name'] = output_file_name
-        self.state['input_file_name_list'] = input_file_name_list
+        self.state['input_file_list'] = input_file_list
         self.state['force_code'] = force_code
 
         self.run_b = True
@@ -120,12 +120,12 @@ class SimpleCoder:
     
 
     def make_message_materials(self):
-        if self.state.get('input_file_name_list', False):
+        if self.state.get('input_file_list', False):
             msg_file_data = []
-            if isinstance(self.state['input_file_name_list'], str):
-                input_file_list = self.state['input_file_name_list'].split()
+            if isinstance(self.state['input_file_list'], str):
+                input_file_list = self.state['input_file_list'].split()
             else:
-                input_file_list = self.state['input_file_name_list']
+                input_file_list = self.state['input_file_list']
             input_file_contents = ""
             for file_name in input_file_list:
                 input_file_contents = f"\n<input file='{file_name}'\n>{self.get_file_contents(file_name)}</input>\n\n"

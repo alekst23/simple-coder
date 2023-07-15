@@ -43,9 +43,18 @@ def generate_one_completion(problems, task_id, n, output_dir):
         'silent': False
     }
     
+    # Create the agent with an agenda for this sample
     coder = SimpleCoder(**agenda)
-    asyncio.run( coder.run() )
+
+    # Check if already running in event loop
+    if asyncio.get_event_loop().is_running():
+        # run coder
+        asyncio.create_task( coder.run() )
+    else:
+        # run coder
+        coder.run()
     
+    # Read the output file
     try:
         with open(tmp_file_path, 'r') as f:
             output = f.read()
