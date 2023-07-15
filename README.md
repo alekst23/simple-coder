@@ -1,17 +1,21 @@
 # MoleculAI - Code generating agent for your LLM
 
-Improving the code generating performance of LLMs
+### Improving code generating performance of LLMs
 
-## Small is Good
+## What are Agents?
 
-Our goal is to demystify LLM agents, and illustrate how very simple behaviors can be used to create gains in output accuracy. 
+An LLM Agent is any code that manages the message state between you and the LLM. The simplest types of agenst are chat bots, which is how most people experience AI interactions. These are just UI elements hooked up to a very simple chat completion end point, typically with some additional hidden prompts. However, these agents do nothing to expand the quality of the output or improve the capability of the AI.
 
-This repo is a minimized implementation of an LLM agent, with a focus on generating code using optimization techniques to enhance the code generating abilities of the bare underlying LLM.
+Other agents are very advanced and can allow the AI to use tools, or construct and manage task lists that can be chained and executed. These agents are very powerful, but are extremely difficult to understand and customize. 
 
-We implement a recursive method, similar to Reflexion ([github](https://github.com/noahshinn024/reflexion)), where the LLM re-evaluates the code that it generates. 
+## What is SimpleCoder
 
-You can use our SimpleCoder agent to generate simple scripts, refactor existing code, or help you build out application frameworks.
+SimpleCoder is a minimized code generating and editing Agent. It implements self-reflection, similar to Reflexion ([github](https://github.com/noahshinn024/reflexion)), to allow the bot to improve on it's own.
 
-## Goal
+It runs on your local machine and can work with your local files, generating new code or refactoring existing files.
 
-Our goal is to *simplify* the LLM agent design, and create a simple code generating interface to an LLM that runs in your local environment. 
+It is hooked up to OpenAI chat completion by default, but can be changed.
+
+## It does not chat. It writes code.
+
+
