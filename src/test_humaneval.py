@@ -12,19 +12,17 @@ except NameError:
 
 logger = logging.getLogger(__name__)
 
-C_DEFAULT_NUM_SAMPLES = 1
-
-def get_file_path(task_id, n, output_dir):
+def get_file_path(task_id, output_dir):
     working_dir = os.path.join(os.getcwd(), output_dir)
-    tmp_file_name = f'{task_id}-{n}.py'.replace('/','-')
+    tmp_file_name = f'{task_id}.py'.replace('/', '-')
     return os.path.join(working_dir, tmp_file_name)
 
 
-def generate_one_completion(problems, task_id, n, output_dir):
+def generate_one_completion(problems, task_id, output_dir):
     logger.info(f"generate_one_completion( {task_id} )")
 
     prompt = problems[task_id]["prompt"]
-    tmp_file_path = get_file_path(task_id, n, output_dir)
+    tmp_file_path = get_file_path(task_id, output_dir)
 
     # pre-check
     if os.path.exists(tmp_file_path):
@@ -35,55 +33,49 @@ def generate_one_completion(problems, task_id, n, output_dir):
                     return f.read()
             except IOError:
                 logger.error(f"Error reading file: {tmp_file_path}")
-    
+
     agenda = {
         'working_dir': output_dir,
         'requirements': f"Provide complete code for the following function signature: {prompt}",
         'output_file_name': tmp_file_path,
         'silent': False
     }
-    
+
     # Create the agent with an agenda for this sample
     coder = SimpleCoder(**agenda)
 
     # Check if already running in event loop
     if asyncio.get_event_loop().is_running():
         # run coder
-        asyncio.create_task( coder.run() )
+        asyncio.create_task(coder.run())
     else:
         # run coder
         coder.run()
-    
+
     # Read the output file
     try:
         with open(tmp_file_path, 'r') as f:
             output = f.read()
     except IOError:
         logger.error(f"Error reading file: {tmp_file_path}")
-    
+
     return output
 
 
-def generate_samples_taskid(pbar, problems, task_id, num_samples_per_task, output_dir):
-    res = [generate_one_completion(problems, task_id, i, output_dir) for i in range(num_samples_per_task)]
-    pbar.update(num_samples_per_task)
-    return res
-
-
-def generate_samples(output_dir, num_samples_per_task=C_DEFAULT_NUM_SAMPLES):
+def generate_samples(output_dir):
     problems = read_problems()
     task_ids = [x[1] for x in enumerate(problems.keys())]
 
-    total_samples = num_samples_per_task * len(task_ids)
+    total_samples = len(task_ids)
     logger.info(f"GENERATING {total_samples} SAMPLES")
 
     samples = []
     with tqdm(total=total_samples) as pbar:
-        results = [generate_samples_taskid(pbar, problems, task_id, num_samples_per_task, output_dir) for task_id in task_ids]
-        
-    for task_id, result in zip(task_ids, results):
-        samples.extend([dict(task_id=task_id, completion=comp) for comp in result])        
-    
+        for task_id in task_ids:
+            result = generate_one_completion(problems, task_id, output_dir)
+            samples.append(dict(task_id=task_id, completion=result))
+            pbar.update(1)
+
     write_jsonl(os.path.join(os.getcwd(), output_dir, "samples.jsonl"), samples)
 
 
