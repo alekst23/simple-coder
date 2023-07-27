@@ -1,7 +1,7 @@
+import asyncio
 from human_eval.data import write_jsonl, read_problems
 import os
 from simple_coder import SimpleCoder
-import asyncio
 import logging
 
 try:
@@ -12,13 +12,14 @@ except NameError:
 
 logger = logging.getLogger(__name__)
 
+
 def get_file_path(task_id, output_dir):
     working_dir = os.path.join(os.getcwd(), output_dir)
     tmp_file_name = f'{task_id}.py'.replace('/', '-')
     return os.path.join(working_dir, tmp_file_name)
 
 
-def generate_one_completion(problems, task_id, output_dir):
+async def generate_one_completion(problems, task_id, output_dir):
     logger.info(f"generate_one_completion( {task_id} )")
 
     prompt = problems[task_id]["prompt"]
@@ -44,13 +45,8 @@ def generate_one_completion(problems, task_id, output_dir):
     # Create the agent with an agenda for this sample
     coder = SimpleCoder(**agenda)
 
-    # Check if already running in event loop
-    if asyncio.get_event_loop().is_running():
-        # run coder
-        asyncio.create_task(coder.run())
-    else:
-        # run coder
-        coder.run()
+    # Run the coder
+    await coder.run()
 
     # Read the output file
     try:
@@ -62,7 +58,7 @@ def generate_one_completion(problems, task_id, output_dir):
     return output
 
 
-def generate_samples(output_dir):
+async def generate_samples(output_dir):
     problems = read_problems()
     task_ids = [x[1] for x in enumerate(problems.keys())]
 
@@ -72,7 +68,7 @@ def generate_samples(output_dir):
     samples = []
     with tqdm(total=total_samples) as pbar:
         for task_id in task_ids:
-            result = generate_one_completion(problems, task_id, output_dir)
+            result = await generate_one_completion(problems, task_id, output_dir)
             samples.append(dict(task_id=task_id, completion=result))
             pbar.update(1)
 
@@ -81,4 +77,4 @@ def generate_samples(output_dir):
 
 if __name__ == "__main__":
     output_dir = 'test-output/human-eval-output-3.5'
-    generate_samples(output_dir)
+    asyncio.run(generate_samples(output_dir))
