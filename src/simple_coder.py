@@ -70,12 +70,15 @@ class SimpleCoder:
         try:
             await self.compose_message_log()
 
-            if self.message_log:
-                response = await self.generate_response()
+            if not self.message_log:
+                # No message to process
+                return
+            
+            response = await self.generate_response()
 
-                await self.process_response(response)
+            await self.process_response(response)
 
-                await self.store_code_file(self.state.get('input_code'))
+            await self.store_code_file(self.state.get('input_code'))
 
         except Exception as e:
             print(traceback.print_exc())
