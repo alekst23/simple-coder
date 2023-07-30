@@ -1,5 +1,6 @@
 import traceback
 from datetime import datetime
+import json
 import llm
 import os
 import re
@@ -7,12 +8,13 @@ from pathlib import Path
 
 C_WORKING_DIR = "~/temp/simple_coder"
 C_CONFIG_CODER = "simple-coder.txt"
+C_CONFIG_LLM = "llm-gpt35.json"
 C_SYSTEM_FILE = "system-log.txt"
 C_STOP_CODE = "JOBDONE"
 C_MAX_EPOCH = 10
 
 class SimpleCoder:
-    def __init__(self, working_dir=C_WORKING_DIR, requirements=None, output_file_name=None, input_file_list=None, force_code=True, silent=False):
+    def __init__(self, working_dir=C_WORKING_DIR, requirements=None, output_file_name=None, input_file_list=None, force_code=True, silent=False, config_llm=C_CONFIG_LLM, config_role=C_CONFIG_CODER):
         self.working_dir = working_dir
         self.message_log = []
 
@@ -26,14 +28,18 @@ class SimpleCoder:
         self.run_epoch = 0
         self.silent = silent
 
-        self.get_config()
+        self.get_config(config_role=config_role, config_llm=config_llm)
     
 
-    def get_config(self, config_file=C_CONFIG_CODER):
-        if not self.state.get('role_config', False):
-            # get data from config file: confg/simple-coder.txt
+    def get_config(self, config_role=C_CONFIG_CODER, config_llm=C_CONFIG_LLM):
+        if not self.state.get('llm_config', False):
             current_dir = os.path.dirname(os.path.realpath(__file__))
-            with open(os.path.join(current_dir, "config", config_file), "r") as file:
+            with open(os.path.join(current_dir, "config", config_llm), "r") as file:
+                self.state['llm_config'] = file.read()
+
+        if not self.state.get('role_config', False):
+            current_dir = os.path.dirname(os.path.realpath(__file__))
+            with open(os.path.join(current_dir, "config", config_role), "r") as file:
                 self.state['role_config'] = file.read()
 
         if self.state.get('requirements', False):
@@ -157,23 +163,16 @@ class SimpleCoder:
         if self.state.get('input_code', False):
             # if input code exists, ask for modification
             msg_1 = f"Given the content in '{self.state['output_file_name']}' and the requirements provided, could you help me modify it to meet these requirements? Specifically, I would like to see a version of '{self.state['output_file_name']}' that includes all necessary changes and additions."
-
-            msg_1b = f"Modify the content in '{self.state['output_file_name']}' to meet the provided requirements. Generate a version of '{self.state['output_file_name']}' that includes all necessary changes and additions."
         else:
             # if input code does not exist, ask for creation
             if self.state.get('force_code', False):
                 # if force_code is set, ask for code creation specifically
                 msg_1 = f"Given the requirements provided, could you help me create content for file named '{self.state['output_file_name']}' that fulfills these requirements? Specifically, I would like you to generate the code for '{self.state['output_file_name']}' that includes all necessary functionalities and features as per the requirements."
-
-                msg1_b = f"Create a new file '{self.state['output_file_name']}' to fulfill the provided requirements. Generate code for '{self.state['output_file_name']}' including all necessary functionalities and features as per the requirements."
-
             else:
                 # ask for creation of generic file
                 msg_1 = f"Given the requirements provided, could you help me create content for file named '{self.state['output_file_name']}' that fulfills these requirements? Specifically, I would like you to generate the content for '{self.state['output_file_name']}' that includes all necessary elements as per the requirements."
-                
-                msg_1b = f"Create a new file '{self.state['output_file_name']}'. This file should fulfill the provided requirements. Generate content for '{self.state['output_file_name']}' including all necessary elements as per the requirements."
 
-        msg_2 = f" Reply with {C_STOP_CODE} only if the file is not empty and it meets the defined requirements."
+        msg_2 = f"Replace all placeholder comments and functions with actual implementations. Reply with {C_STOP_CODE} only if the file is not empty and it meets the defined requirements."
 
         msg_end_control = msg_1 + msg_2
         
@@ -189,8 +188,10 @@ class SimpleCoder:
 
 
     async def generate_response(self):
+        # generate llm_config from json string in our state
+        llm_config = json.loads(self.state['llm_config'])
         # Generate a response
-        response = await llm.generate_chat_completion(self.message_log)
+        response = await llm.generate_chat_completion(self.message_log, **llm_config)
 
         # log its
         self.print_to_system_log(f"RESPONSE: {response}")

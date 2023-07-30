@@ -7,13 +7,13 @@ import time
 
 openai.api_key = OPENAI_API_KEY
 
+# Default values used if no config provided
 C_DEFAULT_MODEL = "gpt-3.5-turbo-16k"
-C_DEFAULT_TEMP = 0.8
+C_DEFAULT_TEMP = 0.3
 C_DEFAULT_MAX_TOKENS = 8000
-C_DEFAULT_MODEL_MAX_TOKENS = 16385 # 4096
 
 # Use openAI ChatGPT 3.5 Turbo chat completion end point
-async def generate_chat_completion(message_log, model_name=C_DEFAULT_MODEL, max_tokens=C_DEFAULT_MAX_TOKENS, temp=C_DEFAULT_TEMP):
+async def generate_chat_completion(message_log, model_name=C_DEFAULT_MODEL, max_tokens=C_DEFAULT_MAX_TOKENS, temperature=C_DEFAULT_TEMP):
     while True:
         try:
             assert isinstance(message_log, list), "message log must be a list"
@@ -22,7 +22,7 @@ async def generate_chat_completion(message_log, model_name=C_DEFAULT_MODEL, max_
             response = await openai.ChatCompletion.acreate(
                 model=model_name,
                 messages=message_log,
-                temperature=temp,
+                temperature=temperature,
                 max_tokens=max_tokens
             )
             response = response.choices[0]['message']['content']
@@ -54,7 +54,7 @@ async def generate_chat_completion(message_log, model_name=C_DEFAULT_MODEL, max_
 async def count_message_tokens(message_log):
     while True:
         try:
-            response = openai.ChatCompletion.create(
+            response = await openai.ChatCompletion.acreate(
                 model=C_DEFAULT_MODEL,
                 messages=message_log,
                 temperature=0.0,
