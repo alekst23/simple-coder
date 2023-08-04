@@ -6,9 +6,12 @@ As any respectable scientist will tell you: the proof of the pudding is in the e
 
 Since this is a code generating agent, we will focus on tests specifically for programming, namely HumanEval.
 
-Using our method, you can witness performance increase of **GPT-3.5 from 48.1% to 68.9%**, making it similar performance to GPT-4, at 67%. 
+Using the SimpleCoder class, it is possible to achieve the following performance gains using OpenAI and GPT:
+- GPT-4: **from 67% to 83%**
+- GPT-3.5: **from 48% to 69%**
 
-[ for test methods see `src/notebook_test.ipynb`]
+[ for test methods see `moleculai/notebook_test.ipynb`]
+
 ### HumanEval Leaderboard
 [Code Generation on HumanEval](https://paperswithcode.com/sota/code-generation-on-humaneval)
 
@@ -16,8 +19,8 @@ Using our method, you can witness performance increase of **GPT-3.5 from 48.1% t
 |------|-------------------------|-------|-----------------------------------------------------------------|------|
 | 1    | Reflexion (GPT-4)       | 91.0  | Reflexion: Language Agents with Verbal Reinforcement Learning   | 2023 |
 | 2    | Parsel (GPT-4 + CodeT) | 85.1  | Parsel: Algorithmic Reasoning with Language Models by Composing Decompositions | 2023 |
-| ***   | SimpleCoder (GPT-4)    | 82.9 | <--- this repo  | July, 2023 |
-| ***   | SimpleCoder (GPT-3.5)  | 68.9 | <--- this repo  | July, 2023 |
+| ***   | SimpleCoder (GPT-4)    | 83 | <--- this repo  | July, 2023 |
+| ***   | SimpleCoder (GPT-3.5)  | 69 | <--- this repo  | July, 2023 |
 | 3    | GPT-4 (zero-shot)       | 67.0  | GPT-4 Technical Report                                          | 2023 |
 | ... |
 | 8    | GPT-3.5                  | 48.1  |  | 2023 |
@@ -64,17 +67,17 @@ process_response(response)
 store_code_file()
 
 ```
-[ you can find this in `src/simple_coder.py > SimpleCoder.work()` ]
+[ you can find this in `moleculai/simple_coder.py > SimpleCoder.work()` ]
 
 
 # Getting started
 Check out the following Jupyter notebooks with samples that will illustrate various use cases:
-* `src/notebook_simple_coder.ipynb`
+* `moleculai/notebook_simple_coder.ipynb`
     * Basic use - generate a new file
     * Generate with reference to another file
-* `src/notebook_refactor.ipynb`
+* `moleculai/notebook_refactor.ipynb`
     * Refactor an existing file
-* *coming soong* `src/notebook_project.ipynb`
+* `moleculai/notebook_project.ipynb`
     * Generate a multi-file project
     * Consistent cross-file references
     * Create documentation
