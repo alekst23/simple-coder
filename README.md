@@ -16,6 +16,7 @@ Using our method, you can witness performance increase of **GPT-3.5 from 48.1% t
 |------|-------------------------|-------|-----------------------------------------------------------------|------|
 | 1    | Reflexion (GPT-4)       | 91.0  | Reflexion: Language Agents with Verbal Reinforcement Learning   | 2023 |
 | 2    | Parsel (GPT-4 + CodeT) | 85.1  | Parsel: Algorithmic Reasoning with Language Models by Composing Decompositions | 2023 |
+| ***   | SimpleCoder (GPT-4)    | 82.9 | <--- this repo  | July, 2023 |
 | ***   | SimpleCoder (GPT-3.5)  | 68.9 | <--- this repo  | July, 2023 |
 | 3    | GPT-4 (zero-shot)       | 67.0  | GPT-4 Technical Report                                          | 2023 |
 | ... |
