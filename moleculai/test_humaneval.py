@@ -19,7 +19,7 @@ def get_file_path(task_id, output_dir):
     return os.path.join(working_dir, tmp_file_name)
 
 
-async def generate_one_completion(problems, task_id, output_dir):
+async def generate_one_completion(problems, task_id, output_dir, config_llm=None):
     logger.info(f"generate_one_completion( {task_id} )")
 
     prompt = problems[task_id]["prompt"]
@@ -39,7 +39,8 @@ async def generate_one_completion(problems, task_id, output_dir):
         'working_dir': output_dir,
         'requirements': f"Provide complete code for the following function signature: {prompt}",
         'output_file_name': tmp_file_path,
-        'silent': False
+        'silent': False,
+        'config_llm': config_llm
     }
 
     # Create the agent with an agenda for this sample
@@ -58,7 +59,7 @@ async def generate_one_completion(problems, task_id, output_dir):
     return output
 
 
-async def generate_samples(output_dir):
+async def generate_samples(output_dir,config_llm=None):
     problems = read_problems()
     task_ids = [x[1] for x in enumerate(problems.keys())]
 
@@ -68,7 +69,7 @@ async def generate_samples(output_dir):
     samples = []
     with tqdm(total=total_samples) as pbar:
         for task_id in task_ids:
-            result = await generate_one_completion(problems, task_id, output_dir)
+            result = await generate_one_completion(problems, task_id, output_dir, config_llm=config_llm)
             samples.append(dict(task_id=task_id, completion=result))
             pbar.update(1)
 
