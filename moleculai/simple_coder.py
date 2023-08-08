@@ -1,10 +1,11 @@
 import traceback
 from datetime import datetime
 import json
-import llm
 import os
 import re
 from pathlib import Path
+
+from .llm import generate_chat_completion
 
 C_WORKING_DIR = "~/temp/simple_coder"
 C_CONFIG_CODER = "simple-coder.txt"
@@ -191,7 +192,7 @@ class SimpleCoder:
         # generate llm_config from json string in our state
         llm_config = json.loads(self.state['llm_config'])
         # Generate a response
-        response = await llm.generate_chat_completion(self.message_log, **llm_config)
+        response = await generate_chat_completion(self.message_log, **llm_config)
 
         # log its
         self.print_to_system_log(f"RESPONSE: {response}")
