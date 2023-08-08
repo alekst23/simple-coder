@@ -10,7 +10,7 @@ Using the SimpleCoder class, it is possible to achieve the following performance
 - GPT-4: **from 67% to 83%**
 - GPT-3.5: **from 48% to 69%**
 
-[ for test methods see `moleculai/notebook_test.ipynb`]
+[ for test methods see `book.4_test.ipynb`]
 
 ### HumanEval Leaderboard
 [Code Generation on HumanEval](https://paperswithcode.com/sota/code-generation-on-humaneval)
@@ -72,12 +72,12 @@ store_code_file()
 
 # Getting started
 Check out the following Jupyter notebooks with samples that will illustrate various use cases:
-* `moleculai/notebook_simple_coder.ipynb`
+* `book.1_simple_coder.ipynb`
     * Basic use - generate a new file
     * Generate with reference to another file
-* `moleculai/notebook_refactor.ipynb`
+* `book.2_refactor.ipynb`
     * Refactor an existing file
-* `moleculai/notebook_project.ipynb`
+* `book.3_project.ipynb`
     * Generate a multi-file project
     * Consistent cross-file references
     * Create documentation
