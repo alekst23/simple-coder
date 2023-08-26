@@ -71,6 +71,12 @@ store_code_file()
 
 
 # Getting started
+## API Keys
+Add your API key to the project as follows:
+1. Create a new file in the project root: `.env`
+2. Add the following line: `export OPENAI_API_KEY=YOUR-API-KEY`
+
+## Running
 Check out the following Jupyter notebooks with samples that will illustrate various use cases:
 * `book.1_simple_coder.ipynb`
     * Basic use - generate a new file

@@ -245,7 +245,7 @@ class SimpleCoder:
         # Define regex pattern to match different code blocks like this:
         # <output type="python">some code with multiple line breaks</output>
         # <cmd type="bash">some bash command</cmd>
-        regex_pattern = r'<(?P<type>code|cmd|output) file_name=([\'"](?P<file_name1>[^\'"]+)[\'"]|\\\'(?P<file_name2>[^\\]+)\\\')>(?P<code>.*?)<\/(?P=type)>'
+        regex_pattern = r'<(?P<type>code|cmd|output|input) file_name=([\'"](?P<file_name1>[^\'"]+)[\'"]|\\\'(?P<file_name2>[^\\]+)\\\')>(?P<code>.*?)<\/(?P=type)>'
         return self.parse_code_blocks(message, regex_pattern)
 
 
