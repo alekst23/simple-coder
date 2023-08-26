@@ -1,4 +1,6 @@
 _*
+!__init__.py
+
 system-log.txt
 output.txt
 
