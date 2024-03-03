@@ -26,7 +26,7 @@ matplotlib-inline==0.1.6
 multidict==6.0.4
 nest-asyncio==1.5.6
 numpy==1.24.4
-openai==0.27.8
+openai==1.13.3
 packaging==23.1
 parso==0.8.3
 pexpect==4.8.0
@@ -47,7 +47,7 @@ termcolor==2.3.0
 tornado==6.3.2
 tqdm==4.65.0
 traitlets==5.9.0
-typing-extensions==4.7.0
+typing-extensions==4.10.0
 urllib3==2.0.3
 wcwidth==0.2.6
 widgetsnbextension==4.0.8

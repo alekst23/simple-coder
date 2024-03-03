@@ -15,7 +15,7 @@ C_STOP_CODE = "JOBDONE"
 C_MAX_EPOCH = 10
 
 class SimpleCoder:
-    def __init__(self, working_dir=C_WORKING_DIR, requirements=None, output_file_name=None, input_file_list=None, force_code=True, silent=False, config_llm=C_CONFIG_LLM, config_role=C_CONFIG_CODER):
+    def __init__(self, working_dir=C_WORKING_DIR, requirements=None, output_file_name=None, input_file_list=None, force_code=True, silent=False, config_llm=C_CONFIG_LLM, config_role=C_CONFIG_CODER, max_epoch=C_MAX_EPOCH):
         self.working_dir = working_dir
         self.message_log = []
 
@@ -27,6 +27,7 @@ class SimpleCoder:
 
         self.run_b = True
         self.run_epoch = 0
+        self.max_epoch = max_epoch
         self.silent = silent
 
         self.get_config(config_role=config_role, config_llm=config_llm)
@@ -63,7 +64,7 @@ class SimpleCoder:
             
             await self.work()
 
-            if self.run_epoch > C_MAX_EPOCH:
+            if self.run_epoch >= self.max_epoch:
                 # Write code state to file
                 await self.store_code_file(self.state.get('input_code'))
                 self.run_b = False
