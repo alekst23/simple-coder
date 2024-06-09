@@ -74,9 +74,31 @@ store_code_file()
 ## API Keys
 Add your API key to the project as follows:
 1. Create a new file in the project root: `.env`
-2. Add the following line: `OPENAI_API_KEY=YOUR-API-KEY`
+2. Add the following line: `OPENAI_API_KEY=<YOUR-API-KEY>`
 
-## Running
+## Installation
+```bash
+git clone git@github.com:alekst23/simple-coder.git
+cd simple-coder && make all
+```
+
+## Running Simple-Coder
+### Basic pattern
+The following code will load the file `relative/path/output-file.py`, or create it if it does not exist. All output will be written to this file. The agent will also load the files `relative/path/file-1.py`, `relative/path/file-1.py`, and make it available to the LLM as additional context.
+
+```python
+from simple_coder import SimpleCoder
+
+coder = SimpleCoder(
+    requirements="Describe the taks or output requriements",
+    working_dir="relative/path",
+    input_file_list=["file-1.py", "file-2.py"],
+    output_file_name="output-file.py"
+)
+await coder.run()
+```
+
+### Samples in Jupyter Notebooks
 Check out the following Jupyter notebooks with samples that will illustrate various use cases:
 * `book.1_simple_coder.ipynb`
     * Basic use - generate a new file
