@@ -1,4 +1,4 @@
-# MoleculAI: Amplifying LLM Code Generation Performance
+# Simple-Coder: Amplifying LLM Code Generation Performance
 
 ## It does not chat. It writes code.
 
@@ -67,7 +67,7 @@ process_response(response)
 store_code_file()
 
 ```
-[ you can find this in `moleculai/simple_coder.py > SimpleCoder.work()` ]
+[ you can find this in `src/simple_coder.py > SimpleCoder.work()` ]
 
 
 # Getting started
