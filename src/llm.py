@@ -7,7 +7,9 @@ import asyncio
 
 from config import OPENAI_API_KEY
 
-openai.api_key = OPENAI_API_KEY
+client = openai.OpenAI(api_key=OPENAI_API_KEY)
+aclient = openai.AsyncOpenAI(api_key=OPENAI_API_KEY)
+
 
 C_DEFAULT_MODEL_CODE = "35"
 
@@ -54,7 +56,7 @@ async def count_message_tokens(message_log):
 async def generate_chat_completion(message_log, model_name=C_MODELS[C_DEFAULT_MODEL_CODE]["model_name"], max_tokens=C_DEFAULT_COMPLETION_TOKENS, temperature=C_DEFAULT_TEMP, logit_bias=None):
     assert isinstance(message_log, list), "message log must be a list"
     assert len(message_log) > 0, "message log must not be empty"
-    
+
     async def fcall():
         response = openai.chat.completions.create(
             model=model_name,
@@ -70,14 +72,12 @@ async def generate_chat_completion(message_log, model_name=C_MODELS[C_DEFAULT_MO
 
 async def count_message_tokens_openai(message_log):
     async def fcall():
-        response = await openai.ChatCompletion.acreate(
-            model=C_MODELS[C_DEFAULT_MODEL_CODE]["model_name"],
+        response = await aclient.chat.completions.create(model=C_MODELS[C_DEFAULT_MODEL_CODE]["model_name"],
             messages=message_log,
             temperature=0.0,
-            max_tokens=1
-        )
+            max_tokens=1)
         return response["usage"]["prompt_tokens"]
-    
+
     return await generic_retry_handler(fcall)
 
 
@@ -85,9 +85,9 @@ async def count_message_tokens_openai(message_log):
 async def calculate_embeddings(content):
 
     async def fcall():
-        result = openai.Embedding.create( input=content, model="text-embedding-ada-002")
-        return result['data'][0]['embedding']
-    
+        result = client.embeddings.create(input=content, model="text-embedding-ada-002")
+        return result.data[0].embedding
+
     return await generic_retry_handler(fcall)
 
 
