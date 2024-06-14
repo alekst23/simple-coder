@@ -5,7 +5,7 @@ import os
 import re
 from pathlib import Path
 
-from llm import generate_chat_completion
+from .llm import generate_chat_completion
 
 C_WORKING_DIR = "~/temp/simple_coder"
 C_CONFIG_CODER = "simple-coder.txt"
